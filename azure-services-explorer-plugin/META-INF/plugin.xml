@@ -1,0 +1,51 @@
+<idea-plugin version="2">
+  <id>com.microsoft.tooling.msservices.intellij.azure-services-explorer</id>
+  <name>Azure Services Explorer</name>
+  <version>1.0</version>
+  <vendor email="xplatjava@microsoft.com" url="http://www.microsoft.com">Microsoft</vendor>
+
+  <description><![CDATA[
+      Azure Services Explorer for Microsoft tools for IntelliJ and Android Studio.
+    ]]></description>
+
+  <change-notes><![CDATA[
+  ]]></change-notes>
+
+  <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+  <idea-version since-build="141"/>
+
+  <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+  <depends>com.intellij.modules.java</depends>
+  <depends>com.intellij.modules.lang</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <fileEditorProvider implementation="com.microsoft.intellij.helpers.storage.BlobExplorerFileEditorProvider"/>
+    <fileEditorProvider implementation="com.microsoft.intellij.helpers.storage.QueueExplorerFileEditorProvider"/>
+    <fileEditorProvider implementation="com.microsoft.intellij.helpers.storage.TableExplorerFileEditorProvider"/>
+    <toolWindow
+            anchor="left"
+            factoryClass="com.microsoft.intellij.components.ServerExplorerToolWindowFactory"
+            id="Service Explorer"
+            canCloseContents="false"
+            icon="/com/microsoft/intellij/icons/azure.png"/>
+  </extensions>
+
+  <application-components>
+      <component>
+          <implementation-class>com.microsoft.intellij.components.MSToolsApplication</implementation-class>
+      </component>
+  </application-components>
+
+  <project-components>
+
+  </project-components>
+
+  <actions>
+    <!-- Add your actions here -->
+  </actions>
+
+</idea-plugin>

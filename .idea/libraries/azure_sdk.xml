@@ -1,0 +1,51 @@
+<component name="libraryTable">
+  <library name="azure-sdk">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-core-0.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-management-0.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-management-compute-0.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-management-media-0.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-management-network-0.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-management-scheduler-0.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-management-sql-0.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-management-storage-0.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-management-websites-0.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-media-0.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-servicebus-0.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-serviceruntime-0.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-tracing-util-0.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/jackson-core-asl-1.9.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/jackson-jaxrs-1.9.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/jackson-mapper-asl-1.9.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/jackson-xc-1.9.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/javax.inject-1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/jaxb-impl-2.2.3-1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/jersey-client-1.13.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/jersey-core-1.13.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/jersey-json-1.13.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/jettison-1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/mail-1.4.5.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-core-0.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-management-0.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-management-compute-0.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-management-media-0.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-management-network-0.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-management-scheduler-0.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-management-sql-0.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-management-storage-0.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-management-websites-0.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-media-0.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-servicebus-0.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-serviceruntime-0.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/azure-tracing-util-0.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/jaxb-impl-2.2.3-1-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/jersey-client-1.13-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/jersey-core-1.13-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/jersey-json-1.13-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/mail-1.4.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="azure-activedirectory-interactive-auth-library-for-java">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/azure-activedirectory-interactive-auth-library-for-java/azure-activedirectory-interactive-auth-library-for-java.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

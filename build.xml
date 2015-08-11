@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="azure-services-explorer" default="all">
+  
+  
+  <property file="build.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="700m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/*.rbc/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.bundle/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/.tox/**"/>
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/RCS/**"/>
+    <exclude name="**/SCCS/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/rcs/**"/>
+    <exclude name="**/vssver.scc/**"/>
+    <exclude name="**/vssver2.scc/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.zip"/>
+    <include name="*.apk"/>
+    <include name="*.war"/>
+    <include name="*.egg"/>
+    <include name="*.ear"/>
+    <include name="*.ane"/>
+    <include name="*.swc"/>
+    <include name="*.jar"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <exclude name="**/?*.java"/>
+    <exclude name="**/?*.form"/>
+    <exclude name="**/?*.class"/>
+    <exclude name="**/?*.groovy"/>
+    <exclude name="**/?*.scala"/>
+    <exclude name="**/?*.flex"/>
+    <exclude name="**/?*.kt"/>
+    <exclude name="**/?*.clj"/>
+    <exclude name="**/?*.aj"/>
+  </patternset>
+
+  <!-- IDEA library jars -->
+  <fileset id="idea.libraries" dir="${idea.home}">
+    <include name="lib/annotations.jar"/>
+    <include name="lib/asm-all.jar"/>
+    <include name="lib/asm-commons.jar"/>
+    <include name="lib/asm.jar"/>
+    <include name="lib/asm4-all.jar"/>
+    <include name="lib/automaton.jar"/>
+    <include name="lib/boot.jar"/>
+    <include name="lib/bootstrap.jar"/>
+    <include name="lib/cglib-2.2.2.jar"/>
+    <include name="lib/cli-parser-1.1.jar"/>
+    <include name="lib/commons-codec-1.8.jar"/>
+    <include name="lib/commons-httpclient-3.1-patched.jar"/>
+    <include name="lib/commons-logging-1.1.3.jar"/>
+    <include name="lib/commons-net-3.3.jar"/>
+    <include name="lib/ecj-4.4.jar"/>
+    <include name="lib/extensions.jar"/>
+    <include name="lib/fluent-hc-4.3.6.jar"/>
+    <include name="lib/forms_rt.jar"/>
+    <include name="lib/freemarker.jar"/>
+    <include name="lib/groovy-all-2.3.9.jar"/>
+    <include name="lib/gson-2.3.jar"/>
+    <include name="lib/guava-17.0.jar"/>
+    <include name="lib/hamcrest-core-1.3.jar"/>
+    <include name="lib/hamcrest-library-1.3.jar"/>
+    <include name="lib/httpclient-4.3.6.jar"/>
+    <include name="lib/httpcore-4.3.3.jar"/>
+    <include name="lib/httpmime-4.3.6.jar"/>
+    <include name="lib/icons.jar"/>
+    <include name="lib/idea.jar"/>
+    <include name="lib/idea_rt.jar"/>
+    <include name="lib/isorelax.jar"/>
+    <include name="lib/javac2.jar"/>
+    <include name="lib/jaxen-1.1.3.jar"/>
+    <include name="lib/jayatana-1.2.4.jar"/>
+    <include name="lib/jcip-annotations.jar"/>
+    <include name="lib/jdkAnnotations.jar"/>
+    <include name="lib/jdom.jar"/>
+    <include name="lib/jgoodies-common-1.2.1.jar"/>
+    <include name="lib/jgoodies-forms.jar"/>
+    <include name="lib/jgoodies-looks-2.4.2.jar"/>
+    <include name="lib/jh.jar"/>
+    <include name="lib/jing.jar"/>
+    <include name="lib/jna-utils.jar"/>
+    <include name="lib/jna.jar"/>
+    <include name="lib/jps-launcher.jar"/>
+    <include name="lib/jps-model.jar"/>
+    <include name="lib/jps-server.jar"/>
+    <include name="lib/jsch-0.1.51.jar"/>
+    <include name="lib/jsch.agentproxy.connector-factory.jar"/>
+    <include name="lib/jsch.agentproxy.core.jar"/>
+    <include name="lib/jsch.agentproxy.pageant.jar"/>
+    <include name="lib/jsch.agentproxy.sshagent.jar"/>
+    <include name="lib/jsch.agentproxy.usocket-jna.jar"/>
+    <include name="lib/jsch.agentproxy.usocket-nc.jar"/>
+    <include name="lib/jsr166e.jar"/>
+    <include name="lib/jsr173_1.0_api.jar"/>
+    <include name="lib/junit-4.11.jar"/>
+    <include name="lib/jzlib-1.1.1.jar"/>
+    <include name="lib/log4j.jar"/>
+    <include name="lib/markdown4j-2.2.jar"/>
+    <include name="lib/markdownj-core-0.4.2-SNAPSHOT.jar"/>
+    <include name="lib/microba.jar"/>
+    <include name="lib/miglayout-swing.jar"/>
+    <include name="lib/nanoxml-2.2.3.jar"/>
+    <include name="lib/nekohtml-1.9.14.jar"/>
+    <include name="lib/netty-all-4.1.0.Beta4.jar"/>
+    <include name="lib/openapi.jar"/>
+    <include name="lib/optimizedFileManager.jar"/>
+    <include name="lib/oromatcher.jar"/>
+    <include name="lib/picocontainer.jar"/>
+    <include name="lib/protobuf-2.5.0.jar"/>
+    <include name="lib/proxy-vole_20131209.jar"/>
+    <include name="lib/pty4j-0.4.15.jar"/>
+    <include name="lib/purejavacomm.jar"/>
+    <include name="lib/resolver.jar"/>
+    <include name="lib/resources.jar"/>
+    <include name="lib/resources_en.jar"/>
+    <include name="lib/rhino-js-1_7R4.jar"/>
+    <include name="lib/rngom-20051226-patched.jar"/>
+    <include name="lib/sanselan-0.98-snapshot.jar"/>
+    <include name="lib/serviceMessages.jar"/>
+    <include name="lib/slf4j-api-1.7.10.jar"/>
+    <include name="lib/slf4j-log4j12-1.7.10.jar"/>
+    <include name="lib/snappy-in-java-0.3.1.jar"/>
+    <include name="lib/swingx-core-1.6.2.jar"/>
+    <include name="lib/trang-core.jar"/>
+    <include name="lib/trove4j.jar"/>
+    <include name="lib/trove4j_src.jar"/>
+    <include name="lib/util.jar"/>
+    <include name="lib/velocity.jar"/>
+    <include name="lib/winp-1.21-patched.jar"/>
+    <include name="lib/xbean.jar"/>
+    <include name="lib/xerces.jar"/>
+    <include name="lib/xmlrpc-2.0.jar"/>
+    <include name="lib/xpp3-1.1.4-min.jar"/>
+    <include name="lib/xstream-1.4.3.jar"/>
+  </fileset>
+
+  <path id="jdk.classpath.idea">
+    <resources refid="idea.libraries" />
+  </path>
+
+  <!-- Project Libraries -->
+  
+  <path id="library.azure-activedirectory-interactive-auth-library-for-java.classpath">
+    <pathelement location="${basedir}/lib/azure-activedirectory-interactive-auth-library-for-java/azure-activedirectory-interactive-auth-library-for-java.jar"/>
+  </path>
+  
+  <path id="library.azure-graph-api.classpath">
+    <pathelement location="${basedir}/lib/azure-graph-api/directory-services-0.11.1.jar"/>
+    <pathelement location="${basedir}/lib/azure-graph-api/odata-engine-core-0.11.1.jar"/>
+    <pathelement location="${basedir}/lib/azure-graph-api/odata-engine-jvm-impl-0.11.1.jar"/>
+  </path>
+  
+  <path id="library.azure-sdk.classpath">
+    <pathelement location="${basedir}/lib/azure-sdk/azure-core-0.7.0.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/azure-management-0.7.0.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/azure-management-compute-0.7.0.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/azure-management-media-0.7.0.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/azure-management-network-0.7.0.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/azure-management-scheduler-0.7.0.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/azure-management-sql-0.7.0.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/azure-management-storage-0.7.0.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/azure-management-websites-0.7.0.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/azure-media-0.7.0.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/azure-servicebus-0.7.0.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/azure-serviceruntime-0.7.0.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/azure-tracing-util-0.7.0.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/jackson-core-asl-1.9.2.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/jackson-jaxrs-1.9.2.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/jackson-mapper-asl-1.9.2.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/jackson-xc-1.9.2.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/javax.inject-1.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/jaxb-impl-2.2.3-1.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/jersey-client-1.13.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/jersey-core-1.13.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/jersey-json-1.13.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/jettison-1.1.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/mail-1.4.5.jar"/>
+  </path>
+  
+  <path id="library.com.google.code.gson:gson:2.3.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/google/code/gson/gson/2.3/gson-2.3.jar"/>
+  </path>
+  
+  <path id="library.com.google.guava:guava:17.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/google/guava/guava/17.0/guava-17.0.jar"/>
+  </path>
+  
+  <path id="library.com.microsoft.azure:azure-storage:3.0.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/fasterxml/jackson/core/jackson-core/2.6.0/jackson-core-2.6.0.jar"/>
+    <pathelement location="${path.variable.maven_repository}/com/microsoft/azure/azure-storage/3.0.0/azure-storage-3.0.0.jar"/>
+    <pathelement location="${path.variable.maven_repository}/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4.jar"/>
+    <pathelement location="${path.variable.maven_repository}/org/slf4j/slf4j-api/1.7.12/slf4j-api-1.7.12.jar"/>
+  </path>
+  
+  <path id="library.common-lib.classpath">
+    <pathelement location="${basedir}/lib/common-lib.jar"/>
+  </path>
+  
+  <path id="library.org.apache.commons:commons-lang3:3.4.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4.jar"/>
+  </path>
+  
+  <path id="library.org.apache.httpcomponents:httpclient:4.3.6.classpath">
+    <pathelement location="${path.variable.maven_repository}/commons-codec/commons-codec/1.6/commons-codec-1.6.jar"/>
+    <pathelement location="${path.variable.maven_repository}/commons-logging/commons-logging/1.1.3/commons-logging-1.1.3.jar"/>
+    <pathelement location="${path.variable.maven_repository}/org/apache/httpcomponents/httpclient/4.3.6/httpclient-4.3.6.jar"/>
+    <pathelement location="${path.variable.maven_repository}/org/apache/httpcomponents/httpcore/4.3.3/httpcore-4.3.3.jar"/>
+  </path>
+  <!-- Register Custom Compiler Taskdefs -->
+  <property name="javac2.home" value="${idea.home}/lib"/>
+  <path id="javac2.classpath">
+    <pathelement location="${javac2.home}/javac2.jar"/>
+    <pathelement location="${javac2.home}/jdom.jar"/>
+    <pathelement location="${javac2.home}/asm-all.jar"/>
+    <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
+  </path>
+  <target name="register.custom.compilers">
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
+    <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
+  </target>
+  
+  <!-- Modules -->
+  
+  
+  <!-- Module azure-services-explorer-plugin -->
+  
+  <dirname property="module.azure-services-explorer-plugin.basedir" file="${ant.file}"/>
+  
+  
+  
+  <property name="compiler.args.azure-services-explorer-plugin" value="-encoding windows-1252 -source 1.6 ${compiler.args}"/>
+  
+  <property name="azure-services-explorer-plugin.output.dir" value="${module.azure-services-explorer-plugin.basedir}/out/production/azure-services-explorer-plugin"/>
+  <property name="azure-services-explorer-plugin.testoutput.dir" value="${module.azure-services-explorer-plugin.basedir}/out/test/azure-services-explorer-plugin"/>
+  
+  <path id="azure-services-explorer-plugin.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="azure-services-explorer-plugin.module.production.classpath">
+    <path refid="jdk.classpath.idea"/>
+    <path refid="library.common-lib.classpath"/>
+    <path refid="library.org.apache.commons:commons-lang3:3.4.classpath"/>
+  </path>
+  
+  <path id="azure-services-explorer-plugin.runtime.production.module.classpath">
+    <pathelement location="${azure-services-explorer-plugin.output.dir}"/>
+    <path refid="library.azure-activedirectory-interactive-auth-library-for-java.classpath"/>
+    <path refid="library.azure-graph-api.classpath"/>
+    <path refid="library.azure-sdk.classpath"/>
+    <path refid="library.common-lib.classpath"/>
+    <path refid="library.com.microsoft.azure:azure-storage:3.0.0.classpath"/>
+    <path refid="library.org.apache.commons:commons-lang3:3.4.classpath"/>
+  </path>
+  
+  <path id="azure-services-explorer-plugin.module.classpath">
+    <pathelement location="${azure-services-explorer-plugin.output.dir}"/>
+    <path refid="library.common-lib.classpath"/>
+    <path refid="library.org.apache.commons:commons-lang3:3.4.classpath"/>
+  </path>
+  
+  <path id="azure-services-explorer-plugin.runtime.module.classpath">
+    <pathelement location="${azure-services-explorer-plugin.testoutput.dir}"/>
+    <pathelement location="${azure-services-explorer-plugin.output.dir}"/>
+    <path refid="library.azure-activedirectory-interactive-auth-library-for-java.classpath"/>
+    <path refid="library.azure-graph-api.classpath"/>
+    <path refid="library.azure-sdk.classpath"/>
+    <path refid="library.common-lib.classpath"/>
+    <path refid="library.com.microsoft.azure:azure-storage:3.0.0.classpath"/>
+    <path refid="library.org.apache.commons:commons-lang3:3.4.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.azure-services-explorer-plugin">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.azure-services-explorer-plugin">
+    <patternset refid="excluded.from.module.azure-services-explorer-plugin"/>
+  </patternset>
+  
+  <path id="azure-services-explorer-plugin.module.sourcepath">
+    <dirset dir="${module.azure-services-explorer-plugin.basedir}/azure-services-explorer-plugin">
+      <include name="src"/>
+      <include name="resources"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.azure-services-explorer-plugin" depends="compile.module.azure-services-explorer-plugin.production,compile.module.azure-services-explorer-plugin.tests" description="Compile module azure-services-explorer-plugin"/>
+  
+  <target name="compile.module.azure-services-explorer-plugin.production" depends="register.custom.compilers" description="Compile module azure-services-explorer-plugin; production classes">
+    <mkdir dir="${azure-services-explorer-plugin.output.dir}"/>
+    <javac2 destdir="${azure-services-explorer-plugin.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${jdk.home}/bin/javac">
+      <compilerarg line="${compiler.args.azure-services-explorer-plugin}"/>
+      <bootclasspath refid="azure-services-explorer-plugin.module.bootclasspath"/>
+      <classpath refid="azure-services-explorer-plugin.module.production.classpath"/>
+      <src refid="azure-services-explorer-plugin.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.azure-services-explorer-plugin"/>
+    </javac2>
+    
+    <copy todir="${azure-services-explorer-plugin.output.dir}">
+      <fileset dir="${module.azure-services-explorer-plugin.basedir}/azure-services-explorer-plugin/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.azure-services-explorer-plugin.basedir}/azure-services-explorer-plugin/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.azure-services-explorer-plugin.tests" depends="register.custom.compilers,compile.module.azure-services-explorer-plugin.production" description="compile module azure-services-explorer-plugin; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.azure-services-explorer-plugin" description="cleanup module">
+    <delete dir="${azure-services-explorer-plugin.output.dir}"/>
+    <delete dir="${azure-services-explorer-plugin.testoutput.dir}"/>
+  </target>
+  
+  <property name="azure-services-explorer-plugin.plugin.path.jar" value="${module.azure-services-explorer-plugin.basedir}/azure-services-explorer-plugin.zip"/>
+  
+  <!-- Build archive for plugin 'azure-services-explorer-plugin' -->
+  <target name="plugin.build.jar.azure-services-explorer-plugin" depends="compile.module.azure-services-explorer-plugin" description="Build plugin archive for module &#39;azure-services-explorer-plugin&#39;">
+    <property name="tmp.dir.azure-services-explorer-plugin" value="${module.azure-services-explorer-plugin.basedir}/../temp"/>
+    <mkdir dir="${tmp.dir.azure-services-explorer-plugin}"/>
+    <mkdir dir="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin"/>
+    <mkdir dir="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib"/>
+    <jar destfile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/azure-services-explorer-plugin.jar" duplicate="preserve">
+      <zipfileset dir="${module.azure-services-explorer-plugin.basedir}/out/production/azure-services-explorer-plugin"/>
+      <zipfileset file="${module.azure-services-explorer-plugin.basedir}/azure-services-explorer-plugin/META-INF/plugin.xml" prefix="META-INF"/>
+      <manifest>
+        <attribute name="Created-By" value="IntelliJ IDEA"/>
+        <attribute name="Manifest-Version" value="1.0"/>
+      </manifest>
+    </jar>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-graph-api/directory-services-0.11.1.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/directory-services-0.11.1.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-graph-api/odata-engine-core-0.11.1.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/odata-engine-core-0.11.1.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-graph-api/odata-engine-jvm-impl-0.11.1.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/odata-engine-jvm-impl-0.11.1.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-activedirectory-interactive-auth-library-for-java/azure-activedirectory-interactive-auth-library-for-java.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/azure-activedirectory-interactive-auth-library-for-java.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/common-lib.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/common-lib.jar"/>
+    <copy file="${path.variable.maven_repository}/com/microsoft/azure/azure-storage/3.0.0/azure-storage-3.0.0.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/azure-storage-3.0.0.jar"/>
+    <copy file="${path.variable.maven_repository}/com/fasterxml/jackson/core/jackson-core/2.6.0/jackson-core-2.6.0.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/jackson-core-2.6.0.jar"/>
+    <copy file="${path.variable.maven_repository}/org/slf4j/slf4j-api/1.7.12/slf4j-api-1.7.12.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/slf4j-api-1.7.12.jar"/>
+    <copy file="${path.variable.maven_repository}/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/commons-lang3-3.4.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/azure-core-0.7.0.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/azure-core-0.7.0.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/azure-management-0.7.0.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/azure-management-0.7.0.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/azure-management-compute-0.7.0.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/azure-management-compute-0.7.0.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/azure-management-media-0.7.0.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/azure-management-media-0.7.0.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/azure-management-network-0.7.0.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/azure-management-network-0.7.0.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/azure-management-scheduler-0.7.0.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/azure-management-scheduler-0.7.0.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/azure-management-sql-0.7.0.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/azure-management-sql-0.7.0.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/azure-management-storage-0.7.0.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/azure-management-storage-0.7.0.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/azure-management-websites-0.7.0.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/azure-management-websites-0.7.0.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/azure-media-0.7.0.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/azure-media-0.7.0.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/azure-servicebus-0.7.0.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/azure-servicebus-0.7.0.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/azure-serviceruntime-0.7.0.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/azure-serviceruntime-0.7.0.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/azure-tracing-util-0.7.0.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/azure-tracing-util-0.7.0.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/jackson-core-asl-1.9.2.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/jackson-core-asl-1.9.2.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/jackson-jaxrs-1.9.2.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/jackson-jaxrs-1.9.2.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/jackson-mapper-asl-1.9.2.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/jackson-mapper-asl-1.9.2.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/jackson-xc-1.9.2.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/jackson-xc-1.9.2.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/javax.inject-1.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/javax.inject-1.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/jaxb-impl-2.2.3-1.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/jaxb-impl-2.2.3-1.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/jersey-client-1.13.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/jersey-client-1.13.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/jersey-core-1.13.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/jersey-core-1.13.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/jersey-json-1.13.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/jersey-json-1.13.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/jettison-1.1.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/jettison-1.1.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/mail-1.4.5.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/mail-1.4.5.jar"/>
+    <zip destfile="${azure-services-explorer-plugin.plugin.path.jar}">
+      <fileset dir="${module.azure-services-explorer-plugin.basedir}/../temp"/>
+    </zip>
+    <delete dir="${tmp.dir.azure-services-explorer-plugin}"/>
+  </target>
+  
+  
+  <!-- Module common-lib -->
+  
+  <dirname property="module.common-lib.basedir" file="${ant.file}"/>
+  
+  
+  
+  <property name="compiler.args.common-lib" value="-encoding windows-1252 -source 1.6 ${compiler.args}"/>
+  
+  <property name="common-lib.output.dir" value="${module.common-lib.basedir}/out/production/common-lib"/>
+  <property name="common-lib.testoutput.dir" value="${module.common-lib.basedir}/out/test/common-lib"/>
+  
+  <path id="common-lib.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="common-lib.module.production.classpath">
+    <path refid="library.azure-sdk.classpath"/>
+    <path refid="library.azure-graph-api.classpath"/>
+    <path refid="library.azure-activedirectory-interactive-auth-library-for-java.classpath"/>
+    <path refid="library.com.google.guava:guava:17.0.classpath"/>
+    <path refid="library.com.google.code.gson:gson:2.3.classpath"/>
+    <path refid="library.com.microsoft.azure:azure-storage:3.0.0.classpath"/>
+    <path refid="library.org.apache.httpcomponents:httpclient:4.3.6.classpath"/>
+  </path>
+  
+  <path id="common-lib.runtime.production.module.classpath">
+    <pathelement location="${common-lib.output.dir}"/>
+  </path>
+  
+  <path id="common-lib.module.classpath">
+    <pathelement location="${common-lib.output.dir}"/>
+    <path refid="library.azure-sdk.classpath"/>
+    <path refid="library.azure-graph-api.classpath"/>
+    <path refid="library.azure-activedirectory-interactive-auth-library-for-java.classpath"/>
+    <path refid="library.com.google.guava:guava:17.0.classpath"/>
+    <path refid="library.com.google.code.gson:gson:2.3.classpath"/>
+    <path refid="library.com.microsoft.azure:azure-storage:3.0.0.classpath"/>
+    <path refid="library.org.apache.httpcomponents:httpclient:4.3.6.classpath"/>
+  </path>
+  
+  <path id="common-lib.runtime.module.classpath">
+    <pathelement location="${common-lib.testoutput.dir}"/>
+    <pathelement location="${common-lib.output.dir}"/>
+    <path refid="library.azure-sdk.classpath"/>
+    <path refid="library.azure-graph-api.classpath"/>
+    <path refid="library.azure-activedirectory-interactive-auth-library-for-java.classpath"/>
+    <path refid="library.com.google.guava:guava:17.0.classpath"/>
+    <path refid="library.com.google.code.gson:gson:2.3.classpath"/>
+    <path refid="library.com.microsoft.azure:azure-storage:3.0.0.classpath"/>
+    <path refid="library.org.apache.httpcomponents:httpclient:4.3.6.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.common-lib">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.common-lib">
+    <patternset refid="excluded.from.module.common-lib"/>
+  </patternset>
+  
+  <path id="common-lib.module.sourcepath">
+    <dirset dir="${module.common-lib.basedir}/common-lib">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.common-lib" depends="compile.module.common-lib.production,compile.module.common-lib.tests" description="Compile module common-lib"/>
+  
+  <target name="compile.module.common-lib.production" depends="register.custom.compilers" description="Compile module common-lib; production classes">
+    <mkdir dir="${common-lib.output.dir}"/>
+    <javac2 destdir="${common-lib.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${jdk.home}/bin/javac">
+      <compilerarg line="${compiler.args.common-lib}"/>
+      <bootclasspath refid="common-lib.module.bootclasspath"/>
+      <classpath refid="common-lib.module.production.classpath"/>
+      <src refid="common-lib.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.common-lib"/>
+    </javac2>
+    
+    <copy todir="${common-lib.output.dir}">
+      <fileset dir="${module.common-lib.basedir}/common-lib/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.common-lib.tests" depends="register.custom.compilers,compile.module.common-lib.production" description="compile module common-lib; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.common-lib" description="cleanup module">
+    <delete dir="${common-lib.output.dir}"/>
+    <delete dir="${common-lib.testoutput.dir}"/>
+  </target>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.azure-services-explorer-plugin, clean.module.common-lib" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, build.all.artifacts, plugin.build.jar.azure-services-explorer-plugin" description="build all modules"/>
+  
+  <target name="init.artifacts">
+    <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+    <property name="artifact.output.common-lib:jar" value="${module.azure-services-explorer-plugin.basedir}/lib"/>
+    <mkdir dir="${artifacts.temp.dir}"/>
+    <property name="temp.jar.path.common-lib.jar" value="${artifacts.temp.dir}/common-lib.jar"/>
+  </target>
+  
+  <target name="artifact.common-lib:jar" depends="init.artifacts, compile.module.common-lib" description="Build &#39;common-lib:jar&#39; artifact">
+    <property name="artifact.temp.output.common-lib:jar" value="${artifacts.temp.dir}/common_lib_jar"/>
+    <mkdir dir="${artifact.temp.output.common-lib:jar}"/>
+    <jar destfile="${temp.jar.path.common-lib.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset dir="${common-lib.output.dir}"/>
+    </jar>
+    <copy file="${temp.jar.path.common-lib.jar}" tofile="${artifact.temp.output.common-lib:jar}/common-lib.jar"/>
+  </target>
+  
+  <target name="build.all.artifacts" depends="artifact.common-lib:jar" description="Build all artifacts">
+    <copy todir="${artifact.output.common-lib:jar}">
+      <fileset dir="${artifact.temp.output.common-lib:jar}"/>
+    </copy>
+    
+    <!-- Delete temporary files -->
+    <delete dir="${artifacts.temp.dir}"/>
+  </target>
+  
+  <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+</project>
