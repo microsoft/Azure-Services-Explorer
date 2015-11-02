@@ -25,6 +25,15 @@
       <root url="jar://$PROJECT_DIR$/lib/azure-sdk/jersey-json-1.13.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/azure-sdk/jettison-1.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/azure-sdk/mail-1.4.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/annotation-detector-3.0.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/applicationinsights-core-1.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/applicationinsights-web-1.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/commons-codec-1.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/commons-logging-1.1.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/commons-io-2.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/httpclient-4.3.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/httpcore-4.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/azure-sdk/applicationinsights-management-1.0.2.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

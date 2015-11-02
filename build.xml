@@ -198,6 +198,15 @@
     <pathelement location="${basedir}/lib/azure-sdk/jersey-json-1.13.jar"/>
     <pathelement location="${basedir}/lib/azure-sdk/jettison-1.1.jar"/>
     <pathelement location="${basedir}/lib/azure-sdk/mail-1.4.5.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/annotation-detector-3.0.4.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/applicationinsights-core-1.0.1.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/applicationinsights-web-1.0.1.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/applicationinsights-management-1.0.2.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/commons-codec-1.6.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/commons-logging-1.1.3.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/commons-io-2.4.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/httpclient-4.3.6.jar"/>
+    <pathelement location="${basedir}/lib/azure-sdk/httpcore-4.3.jar"/>
   </path>
   
   <path id="library.com.google.code.gson:gson:2.3.classpath">
@@ -390,6 +399,15 @@
     <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/jersey-json-1.13.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/jersey-json-1.13.jar"/>
     <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/jettison-1.1.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/jettison-1.1.jar"/>
     <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/mail-1.4.5.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/mail-1.4.5.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/annotation-detector-3.0.4.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/annotation-detector-3.0.4.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/applicationinsights-core-1.0.1.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/applicationinsights-core-1.0.1.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/applicationinsights-web-1.0.1.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/applicationinsights-web-1.0.1.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/applicationinsights-management-1.0.2.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/applicationinsights-management-1.0.2.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/commons-codec-1.6.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/commons-codec-1.6.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/commons-logging-1.1.3.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/commons-logging-1.1.3.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/commons-io-2.4.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/commons-io-2.4.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/httpclient-4.3.6.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/httpclient-4.3.6.jar"/>
+    <copy file="${module.azure-services-explorer-plugin.basedir}/lib/azure-sdk/httpcore-4.3.jar" tofile="${tmp.dir.azure-services-explorer-plugin}/azure-services-explorer-plugin/lib/httpcore-4.3.jar"/>
     <zip destfile="${azure-services-explorer-plugin.plugin.path.jar}">
       <fileset dir="${module.azure-services-explorer-plugin.basedir}/../temp"/>
     </zip>
