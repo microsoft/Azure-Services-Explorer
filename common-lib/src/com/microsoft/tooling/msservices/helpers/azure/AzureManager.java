@@ -21,6 +21,8 @@
  */
 package com.microsoft.tooling.msservices.helpers.azure;
 
+import com.microsoft.tooling.msservices.helpers.IDEHelper.ArtifactDescriptor;
+import com.microsoft.tooling.msservices.helpers.IDEHelper.ProjectDescriptor;
 import com.microsoft.tooling.msservices.helpers.NotNull;
 import com.microsoft.tooling.msservices.helpers.Nullable;
 import com.microsoft.tooling.msservices.helpers.auth.UserInfo;
@@ -28,6 +30,10 @@ import com.microsoft.tooling.msservices.model.Subscription;
 import com.microsoft.tooling.msservices.model.ms.*;
 import com.microsoft.tooling.msservices.model.storage.StorageAccount;
 import com.microsoft.tooling.msservices.model.vm.*;
+import com.microsoft.tooling.msservices.model.ws.WebHostingPlan;
+import com.microsoft.tooling.msservices.model.ws.WebSite;
+import com.microsoft.tooling.msservices.model.ws.WebSiteConfiguration;
+import com.microsoft.tooling.msservices.model.ws.WebSitePublishSettings;
 import com.microsoft.tooling.msservices.serviceexplorer.EventHelper.EventWaitHandle;
 
 import java.util.List;
@@ -240,5 +246,67 @@ public interface AzureManager {
             throws AzureCmdException;
 
     void deleteStorageAccount(@NotNull StorageAccount storageAccount)
+            throws AzureCmdException;
+
+    @NotNull
+    List<String> getWebSpaces(@NotNull String subscriptionId)
+            throws AzureCmdException;
+
+    @NotNull
+    List<WebSite> getWebSites(@NotNull String subscriptionId, @NotNull String webSpaceName)
+            throws AzureCmdException;
+
+    @NotNull
+    List<WebHostingPlan> getWebHostingPlans(@NotNull String subscriptionId, @NotNull String webSpaceName)
+            throws AzureCmdException;
+
+    @NotNull
+    WebSiteConfiguration getWebSiteConfiguration(@NotNull String subscriptionId, @NotNull String webSpaceName,
+                                                 @NotNull String webSiteName)
+            throws AzureCmdException;
+
+    @NotNull
+    WebSitePublishSettings getWebSitePublishSettings(@NotNull String subscriptionId, @NotNull String webSpaceName,
+                                                     @NotNull String webSiteName)
+            throws AzureCmdException;
+
+    void restartWebSite(@NotNull String subscriptionId, @NotNull String webSpaceName, @NotNull String webSiteName)
+            throws AzureCmdException;
+
+    @NotNull
+    WebSite createWebSite(@NotNull String subscriptionId, @NotNull String webSpaceName,
+                          @NotNull String webHostingPlanName, @NotNull String webSiteName)
+            throws AzureCmdException;
+
+    @NotNull
+    WebSiteConfiguration updateWebSiteConfiguration(@NotNull String subscriptionId,
+                                                    @NotNull String webSpaceName,
+                                                    @NotNull String webSiteName,
+                                                    @NotNull WebSiteConfiguration webSiteConfiguration)
+            throws AzureCmdException;
+
+    @NotNull
+    WebHostingPlan createWebHostingPlan(@NotNull String subscriptionId,
+                                        @NotNull WebHostingPlan webHostingPlan)
+            throws AzureCmdException;
+
+    @NotNull
+    List<String> getWebSiteGeoRegionNames()
+            throws AzureCmdException;
+
+    @NotNull
+    String getWebSpaceName(@NotNull String geoRegionName)
+            throws AzureCmdException;
+
+    @Nullable
+    ArtifactDescriptor getWebArchiveArtifact(@NotNull ProjectDescriptor projectDescriptor)
+            throws AzureCmdException;
+
+    void deployWebArchiveArtifact(@NotNull ProjectDescriptor projectDescriptor,
+                                  @NotNull ArtifactDescriptor artifactDescriptor,
+                                  @NotNull WebSite webSite);
+
+    void publishWebArchiveArtifact(@NotNull String subscriptionId, @NotNull String webSpaceName,
+                                   @NotNull String webSiteName, @NotNull String artifactPath)
             throws AzureCmdException;
 }

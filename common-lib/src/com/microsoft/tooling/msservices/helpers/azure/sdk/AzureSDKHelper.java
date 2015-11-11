@@ -37,6 +37,14 @@ import com.microsoft.tooling.msservices.helpers.azure.AzureManagerImpl;
 import com.microsoft.tooling.msservices.model.storage.ClientStorageAccount;
 import com.microsoft.tooling.msservices.model.storage.StorageAccount;
 import com.microsoft.tooling.msservices.model.vm.*;
+import com.microsoft.tooling.msservices.model.ws.WebHostingPlan;
+import com.microsoft.tooling.msservices.model.ws.WebSite;
+import com.microsoft.tooling.msservices.model.ws.WebSiteConfiguration;
+import com.microsoft.tooling.msservices.model.ws.WebSiteConfiguration.ConnectionInfo;
+import com.microsoft.tooling.msservices.model.ws.WebSitePublishSettings;
+import com.microsoft.tooling.msservices.model.ws.WebSitePublishSettings.FTPPublishProfile;
+import com.microsoft.tooling.msservices.model.ws.WebSitePublishSettings.MSDeployPublishProfile;
+import com.microsoft.tooling.msservices.model.ws.WebSitePublishSettings.PublishProfile;
 import com.microsoft.windowsazure.Configuration;
 import com.microsoft.windowsazure.core.OperationResponse;
 import com.microsoft.windowsazure.core.OperationStatus;
@@ -60,6 +68,9 @@ import com.microsoft.windowsazure.management.storage.StorageAccountOperations;
 import com.microsoft.windowsazure.management.storage.StorageManagementClient;
 import com.microsoft.windowsazure.management.storage.StorageManagementService;
 import com.microsoft.windowsazure.management.storage.models.*;
+import com.microsoft.windowsazure.management.websites.*;
+import com.microsoft.windowsazure.management.websites.models.*;
+import com.microsoft.windowsazure.management.websites.models.WebSpacesListResponse.WebSpace;
 import org.xml.sax.SAXException;
 
 import javax.security.cert.X509Certificate;
@@ -648,6 +659,215 @@ public class AzureSDKHelper {
     }
 
     @NotNull
+    public static SDKRequestCallback<List<String>, WebSiteManagementClient> getWebSpaces() {
+        return new SDKRequestCallback<List<String>, WebSiteManagementClient>() {
+            @NotNull
+            @Override
+            public List<String> execute(@NotNull WebSiteManagementClient client)
+                    throws Throwable {
+                List<String> wsList = new ArrayList<String>();
+
+                for (WebSpace webSpace : getWebSpaces(client)) {
+                    if (webSpace.getName() != null) {
+                        wsList.add(webSpace.getName());
+                    }
+                }
+
+                return wsList;
+            }
+        };
+    }
+
+    @NotNull
+    public static SDKRequestCallback<List<WebSite>, WebSiteManagementClient> getWebSites(@NotNull final String webSpaceName) {
+        return new SDKRequestCallback<List<WebSite>, WebSiteManagementClient>() {
+            @NotNull
+            @Override
+            public List<WebSite> execute(@NotNull WebSiteManagementClient client)
+                    throws Throwable {
+                List<WebSite> wsList = new ArrayList<WebSite>();
+
+                String subscriptionId = client.getCredentials().getSubscriptionId();
+
+                for (com.microsoft.windowsazure.management.websites.models.WebSite webSite : getWebSites(client,
+                        webSpaceName)) {
+                    WebSite ws = loadWebSite(subscriptionId, webSpaceName, webSite);
+                    wsList.add(ws);
+                }
+
+                return wsList;
+            }
+        };
+    }
+
+    @NotNull
+    public static SDKRequestCallback<List<WebHostingPlan>, WebSiteManagementClient> getWebHostingPlans(@NotNull final String webSpaceName) {
+        return new SDKRequestCallback<List<WebHostingPlan>, WebSiteManagementClient>() {
+            @NotNull
+            @Override
+            public List<WebHostingPlan> execute(@NotNull WebSiteManagementClient client)
+                    throws Throwable {
+                List<WebHostingPlan> whpList = new ArrayList<WebHostingPlan>();
+
+                String subscriptionId = client.getCredentials().getSubscriptionId();
+
+                for (com.microsoft.windowsazure.management.websites.models.WebHostingPlan webHostingPlan :
+                        getWebHostingPlans(client, webSpaceName)) {
+                    WebHostingPlan ws = new WebHostingPlan(Strings.nullToEmpty(webHostingPlan.getName()),
+                            webSpaceName,
+                            subscriptionId);
+
+                    whpList.add(ws);
+                }
+
+                return whpList;
+            }
+        };
+    }
+
+    @NotNull
+    public static SDKRequestCallback<WebSiteConfiguration, WebSiteManagementClient> getWebSiteConfiguration(@NotNull final String webSpaceName,
+                                                                                                            @NotNull final String webSiteName) {
+        return new SDKRequestCallback<WebSiteConfiguration, WebSiteManagementClient>() {
+            @NotNull
+            @Override
+            public WebSiteConfiguration execute(@NotNull WebSiteManagementClient client)
+                    throws Throwable {
+                String subscriptionId = client.getCredentials().getSubscriptionId();
+                WebSiteGetConfigurationResponse webSiteConfiguration = getWebSiteConfiguration(client, webSpaceName, webSiteName);
+
+                return loadWebSiteConfiguration(subscriptionId, webSpaceName, webSiteName, webSiteConfiguration);
+            }
+        };
+    }
+
+    @NotNull
+    public static SDKRequestCallback<WebSitePublishSettings, WebSiteManagementClient> getWebSitePublishSettings(@NotNull final String webSpaceName,
+                                                                                                                @NotNull final String webSiteName) {
+        return new SDKRequestCallback<WebSitePublishSettings, WebSiteManagementClient>() {
+            @NotNull
+            @Override
+            public WebSitePublishSettings execute(@NotNull WebSiteManagementClient client)
+                    throws Throwable {
+                String subscriptionId = client.getCredentials().getSubscriptionId();
+                WebSitePublishSettings wsps = new WebSitePublishSettings(webSpaceName, webSiteName, subscriptionId);
+
+                WebSiteGetPublishProfileResponse webSitePublishProfile = getWebSitePublishProfile(client, webSpaceName, webSiteName);
+
+                List<WebSitePublishSettings.PublishProfile> publishProfileList = wsps.getPublishProfileList();
+
+                for (WebSiteGetPublishProfileResponse.PublishProfile publishProfile : webSitePublishProfile.getPublishProfiles()) {
+                    String name = Strings.nullToEmpty(publishProfile.getProfileName());
+                    final String publishMethod = Strings.nullToEmpty(publishProfile.getPublishMethod());
+
+                    PublishProfile pp;
+
+                    if ("MSDeploy".equals(publishMethod)) {
+                        pp = new MSDeployPublishProfile(name);
+                        ((MSDeployPublishProfile) pp).setMsdeploySite(Strings.nullToEmpty(publishProfile.getMSDeploySite()));
+                    } else if ("FTP".equals(publishMethod)) {
+                        pp = new FTPPublishProfile(name);
+                        ((FTPPublishProfile) pp).setFtpPassiveMode(publishProfile.isFtpPassiveMode());
+                    } else {
+                        pp = new PublishProfile(name) {
+                            @NotNull
+                            @Override
+                            public String getPublishMethod() {
+                                return publishMethod;
+                            }
+                        };
+                    }
+
+                    pp.setPublishUrl(Strings.nullToEmpty(publishProfile.getPublishUrl()));
+                    pp.setUserName(Strings.nullToEmpty(publishProfile.getUserName()));
+                    pp.setPassword(Strings.nullToEmpty(publishProfile.getUserPassword()));
+                    pp.setDestinationAppUrl(publishProfile.getDestinationAppUri() != null ?
+                            publishProfile.getDestinationAppUri().toString() : "");
+                    pp.setSqlServerDBConnectionString(Strings.nullToEmpty(publishProfile.getSqlServerConnectionString()));
+                    pp.setMySQLDBConnectionString(Strings.nullToEmpty(publishProfile.getMySqlConnectionString()));
+                    pp.setHostingProviderForumLink(publishProfile.getHostingProviderForumUri() != null ?
+                            publishProfile.getHostingProviderForumUri().toString() : "");
+                    pp.setControlPanelLink(publishProfile.getControlPanelUri() != null ?
+                            publishProfile.getControlPanelUri().toString() : "");
+
+                    publishProfileList.add(pp);
+                }
+
+                return wsps;
+            }
+        };
+    }
+
+    @NotNull
+    public static SDKRequestCallback<Void, WebSiteManagementClient> restartWebSite(@NotNull final String webSpaceName,
+                                                                                   @NotNull final String webSiteName) {
+        return new SDKRequestCallback<Void, WebSiteManagementClient>() {
+            @NotNull
+            @Override
+            public Void execute(@NotNull WebSiteManagementClient client)
+                    throws Throwable {
+                getWebSiteOperations(client).restart(webSpaceName, webSiteName);
+
+                return null;
+            }
+        };
+    }
+
+    @NotNull
+    public static SDKRequestCallback<WebSite, WebSiteManagementClient> createWebSite(@NotNull final String webSpaceName,
+                                                                                     @NotNull final String webHostingPlanName,
+                                                                                     @NotNull final String webSiteName) {
+        return new SDKRequestCallback<WebSite, WebSiteManagementClient>() {
+            @NotNull
+            @Override
+            public WebSite execute(@NotNull WebSiteManagementClient client)
+                    throws Throwable {
+                String subscriptionId = client.getCredentials().getSubscriptionId();
+                WebSiteCreateParameters wsCreateParams = new WebSiteCreateParameters(webSiteName, webHostingPlanName);
+                com.microsoft.windowsazure.management.websites.models.WebSite webSite =
+                        getWebSiteOperations(client).create(webSpaceName, wsCreateParams).getWebSite();
+
+                return loadWebSite(subscriptionId, webSpaceName, webSite);
+            }
+        };
+    }
+
+    @NotNull
+    public static SDKRequestCallback<WebSiteConfiguration, WebSiteManagementClient> updateWebSiteConfiguration(@NotNull final String webSpaceName,
+                                                                                                               @NotNull final String webSiteName,
+                                                                                                               @NotNull final WebSiteConfiguration webSiteConfiguration) {
+        return new SDKRequestCallback<WebSiteConfiguration, WebSiteManagementClient>() {
+            @NotNull
+            @Override
+            public WebSiteConfiguration execute(@NotNull WebSiteManagementClient client)
+                    throws Throwable {
+                updateWebSiteConfiguration(client, webSpaceName, webSiteName, webSiteConfiguration);
+                WebSiteGetConfigurationResponse wsgcr = getWebSiteConfiguration(client, webSpaceName, webSiteName);
+
+                return loadWebSiteConfiguration(webSiteConfiguration, wsgcr);
+            }
+        };
+    }
+
+    @NotNull
+    public static SDKRequestCallback<WebHostingPlan, WebSiteManagementClient> createWebHostingPlan(@NotNull final WebHostingPlan webHostingPlan) {
+        return new SDKRequestCallback<WebHostingPlan, WebSiteManagementClient>() {
+            @NotNull
+            @Override
+            public WebHostingPlan execute(@NotNull WebSiteManagementClient client)
+                    throws Throwable {
+                WebHostingPlanOperations whpo = getWebHostingPlanOperations(client);
+                WebHostingPlanCreateParameters whpcp = new WebHostingPlanCreateParameters(webHostingPlan.getName());
+                whpcp.setSKU(SkuOptions.Free);
+
+                whpo.create(webHostingPlan.getWebSpaceName(), whpcp);
+
+                return webHostingPlan;
+            }
+        };
+    }
+
+    @NotNull
     public static ComputeManagementClient getComputeManagementClient(@NotNull String subscriptionId,
                                                                      @NotNull String accessToken)
             throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException,
@@ -774,6 +994,50 @@ public class AzureSDKHelper {
 
         if (client == null) {
             throw new AzureCmdException("Unable to instantiate Network Management client");
+        }
+
+        return client;
+    }
+
+    @NotNull
+    public static WebSiteManagementClient getWebSiteManagementClient(@NotNull String subscriptionId,
+                                                                     @NotNull String accessToken)
+            throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException,
+            XPathExpressionException, ParserConfigurationException, SAXException, AzureCmdException {
+        Configuration configuration = getConfigurationFromAuthToken(subscriptionId);
+
+        if (configuration == null) {
+            throw new AzureCmdException("Unable to instantiate Configuration");
+        }
+
+        WebSiteManagementClient client = WebSiteManagementService.create(configuration);
+
+        if (client == null) {
+            throw new AzureCmdException("Unable to instantiate Web Site Management client");
+        }
+        // add a request filter for tacking on the A/D auth token if the current authentication
+        // mode is active directory
+        AuthTokenRequestFilter requestFilter = new AuthTokenRequestFilter(accessToken);
+        return client.withRequestFilterFirst(requestFilter);
+    }
+
+    @NotNull
+    public static WebSiteManagementClient getWebSiteManagementClient(@NotNull String subscriptionId,
+                                                                     @NotNull String managementCertificate,
+                                                                     @NotNull String serviceManagementUrl)
+            throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException,
+            XPathExpressionException, ParserConfigurationException, SAXException, AzureCmdException {
+        Configuration configuration = getConfigurationFromCertificate(subscriptionId, managementCertificate,
+                serviceManagementUrl);
+
+        if (configuration == null) {
+            throw new AzureCmdException("Unable to instantiate Configuration");
+        }
+
+        WebSiteManagementClient client = WebSiteManagementService.create(configuration);
+
+        if (client == null) {
+            throw new AzureCmdException("Unable to instantiate Web Site Management client");
         }
 
         return client;
@@ -967,6 +1231,46 @@ public class AzureSDKHelper {
         }
 
         return sco;
+    }
+
+    @NotNull
+    private static WebSpaceOperations getWebSpaceOperations(@NotNull WebSiteManagementClient client)
+            throws Exception {
+        WebSpaceOperations wso = client.getWebSpacesOperations();
+
+        if (wso == null) {
+            throw new Exception("Unable to retrieve Web Space information");
+        }
+
+        return wso;
+    }
+
+    @NotNull
+    private static WebHostingPlanOperations getWebHostingPlanOperations(@NotNull WebSiteManagementClient client)
+            throws Exception {
+        WebHostingPlanOperations whpo = client.getWebHostingPlansOperations();
+
+        if (whpo == null) {
+            throw new Exception("Unable to retrieve Web Hosting Plan information");
+        }
+
+        return whpo;
+    }
+
+    @NotNull
+    private static WebSiteOperations getWebSiteOperations(@NotNull final WebSiteManagementClient client)
+            throws Exception {
+        /*
+        final WebSiteOperations wsoInternal = client.getWebSitesOperations();
+
+        if (wsoInternal == null) {
+            throw new Exception("Unable to retrieve Web Site information");
+        }
+
+        return wso;
+        */
+
+        return new WebSiteOperationsImpl2((WebSiteManagementClientImpl) client);
     }
 
     @NotNull
@@ -1170,6 +1474,102 @@ public class AzureSDKHelper {
         }
     }
 
+    private static void validateOperationStatus(@Nullable WebSiteOperationStatusResponse osr) throws Exception {
+        if (osr == null) {
+            throw new Exception("Unable to retrieve Operation Status");
+        }
+
+        if (osr.getErrors() != null && osr.getErrors().size() > 0) {
+            throw new Exception(osr.getErrors().get(0).getMessage());
+        }
+    }
+
+    @NotNull
+    private static WebSpacesListResponse getWebSpaces(@NotNull WebSiteManagementClient client) throws Exception {
+        WebSpacesListResponse wslr = getWebSpaceOperations(client).list();
+
+        if (wslr == null) {
+            throw new Exception("Unable to retrieve Web Spaces information");
+        }
+
+        return wslr;
+    }
+
+    @NotNull
+    private static WebSpacesListWebSitesResponse getWebSites(@NotNull WebSiteManagementClient client,
+                                                             @NotNull String webSpaceName)
+            throws Exception {
+        WebSiteListParameters webSiteListParameters = new WebSiteListParameters();
+        webSiteListParameters.getPropertiesToInclude().add("Name");
+        webSiteListParameters.getPropertiesToInclude().add("WebSpace");
+        webSiteListParameters.getPropertiesToInclude().add("Status");
+        webSiteListParameters.getPropertiesToInclude().add("Url");
+
+        WebSpacesListWebSitesResponse wslwsr = getWebSpaceOperations(client).listWebSites(webSpaceName,
+                webSiteListParameters);
+
+        if (wslwsr == null) {
+            throw new Exception("Unable to retrieve Web Sites information");
+        }
+
+        return wslwsr;
+    }
+
+    @NotNull
+    private static WebHostingPlanListResponse getWebHostingPlans(@NotNull WebSiteManagementClient client,
+                                                                 @NotNull String webSpaceName)
+            throws Exception {
+        WebHostingPlanListResponse whplr = getWebHostingPlanOperations(client).list(webSpaceName);
+
+        if (whplr == null) {
+            throw new Exception("Unable to retrieve Web Hosting Plans information");
+        }
+
+        return whplr;
+    }
+
+    @NotNull
+    private static WebSiteGetConfigurationResponse getWebSiteConfiguration(@NotNull WebSiteManagementClient client,
+                                                                           @NotNull String webSpaceName,
+                                                                           @NotNull String webSiteName)
+            throws Exception {
+        WebSiteGetConfigurationResponse wsgcr = getWebSiteOperations(client).getConfiguration(webSpaceName, webSiteName);
+
+        if (wsgcr == null) {
+            throw new Exception("Unable to retrieve Web Site Configuration information");
+        }
+
+        return wsgcr;
+    }
+
+    @NotNull
+    private static void updateWebSiteConfiguration(@NotNull WebSiteManagementClient client,
+                                                   @NotNull String webSpaceName,
+                                                   @NotNull String webSiteName,
+                                                   @NotNull WebSiteConfiguration webSiteConfiguration)
+            throws Exception {
+        WebSiteUpdateConfigurationParameters wsucp = loadWebSiteUpdateConfigurationParameters(webSiteConfiguration);
+
+        OperationResponse or = getWebSiteOperations(client).updateConfiguration(webSpaceName, webSiteName, wsucp);
+
+        //WebSiteOperationStatusResponse osr = getOperationStatusResponse(client, webSpaceName, webSiteName, or);
+        //validateOperationStatus(osr);
+    }
+
+    @NotNull
+    private static WebSiteGetPublishProfileResponse getWebSitePublishProfile(@NotNull WebSiteManagementClient client,
+                                                                             @NotNull String webSpaceName,
+                                                                             @NotNull String webSiteName)
+            throws Exception {
+        WebSiteGetPublishProfileResponse wsgppr = getWebSiteOperations(client).getPublishProfile(webSpaceName, webSiteName);
+
+        if (wsgppr == null) {
+            throw new Exception("Unable to retrieve Web Site Publish Profile information");
+        }
+
+        return wsgppr;
+    }
+
     @Nullable
     private static OperationStatusResponse getOperationStatusResponse(@NotNull ComputeManagementClient client,
                                                                       @NotNull OperationResponse or)
@@ -1231,6 +1631,43 @@ public class AzureSDKHelper {
                 ServiceException ex = new ServiceException(osr.getError().getCode() + " : " + osr.getError().getMessage());
                 ex.setErrorCode(osr.getError().getCode());
                 ex.setErrorMessage(osr.getError().getMessage());
+                throw ex;
+            } else {
+                throw new ServiceException("");
+            }
+        }
+
+        return osr;
+    }
+
+    @Nullable
+    private static WebSiteOperationStatusResponse getOperationStatusResponse(@NotNull WebSiteManagementClient client,
+                                                                             @NotNull String webSpaceName,
+                                                                             @NotNull String webSiteName,
+                                                                             @NotNull OperationResponse or)
+            throws InterruptedException, java.util.concurrent.ExecutionException, ServiceException {
+        WebSiteOperationStatusResponse osr = client.getOperationStatusAsync(webSpaceName, webSiteName, or.getRequestId()).get();
+        int delayInSeconds = 30;
+
+        if (client.getLongRunningOperationInitialTimeout() >= 0) {
+            delayInSeconds = client.getLongRunningOperationInitialTimeout();
+        }
+
+        while (osr.getStatus() == WebSiteOperationStatus.InProgress) {
+            Thread.sleep(delayInSeconds * 1000);
+            osr = client.getOperationStatusAsync(webSpaceName, webSiteName, or.getRequestId()).get();
+            delayInSeconds = 30;
+
+            if (client.getLongRunningOperationRetryTimeout() >= 0) {
+                delayInSeconds = client.getLongRunningOperationRetryTimeout();
+            }
+        }
+
+        if (osr.getStatus() != WebSiteOperationStatus.Succeeded) {
+            if (osr.getErrors() != null && osr.getErrors().size() > 0) {
+                ServiceException ex = new ServiceException(osr.getErrors().get(0).getCode() + " : " + osr.getErrors().get(0).getMessage());
+                ex.setErrorCode(osr.getErrors().get(0).getCode());
+                ex.setErrorMessage(osr.getErrors().get(0).getMessage());
                 throw ex;
             } else {
                 throw new ServiceException("");
@@ -1574,6 +2011,94 @@ public class AzureSDKHelper {
         }
 
         return affinityGroupList;
+    }
+
+    @NotNull
+    private static WebSite loadWebSite(@NotNull String subscriptionId,
+                                       @NotNull String webSpaceName,
+                                       @NotNull com.microsoft.windowsazure.management.websites.models.WebSite webSite) {
+        WebSite ws = new WebSite(Strings.nullToEmpty(webSite.getName()),
+                webSpaceName,
+                subscriptionId);
+
+        return loadWebSite(ws, webSite);
+    }
+
+    @NotNull
+    private static WebSite loadWebSite(@NotNull WebSite ws,
+                                       @NotNull com.microsoft.windowsazure.management.websites.models.WebSite webSite) {
+        ws.setStatus(Strings.nullToEmpty(webSite.getState()));
+        ws.setUrl(webSite.getUri() != null ? webSite.getUri().toString() : "");
+
+        return ws;
+    }
+
+    private static WebSiteConfiguration loadWebSiteConfiguration(@NotNull String subscriptionId,
+                                                                 @NotNull String webSpaceName,
+                                                                 @NotNull String webSiteName,
+                                                                 @NotNull WebSiteGetConfigurationResponse webSiteConfiguration) {
+        WebSiteConfiguration wsc = new WebSiteConfiguration(webSpaceName, webSiteName, subscriptionId);
+
+        return loadWebSiteConfiguration(wsc, webSiteConfiguration);
+    }
+
+    private static WebSiteConfiguration loadWebSiteConfiguration(@NotNull WebSiteConfiguration wsc,
+                                                                 @NotNull WebSiteGetConfigurationResponse webSiteConfiguration) {
+        wsc.setNetFrameworkVersion(Strings.nullToEmpty(webSiteConfiguration.getNetFrameworkVersion()));
+        wsc.setJavaVersion(Strings.nullToEmpty(webSiteConfiguration.getJavaVersion()));
+        wsc.setJavaContainer(Strings.nullToEmpty(webSiteConfiguration.getJavaContainer()));
+        wsc.setJavaContainerVersion(Strings.nullToEmpty(webSiteConfiguration.getJavaContainerVersion()));
+        wsc.setPhpVersion(Strings.nullToEmpty(webSiteConfiguration.getPhpVersion()));
+        wsc.setHttpLoggingEnabled(webSiteConfiguration.isHttpLoggingEnabled() != null ?
+                webSiteConfiguration.isHttpLoggingEnabled() :
+                false);
+        wsc.setDetailedErrorLoggingEnabled(webSiteConfiguration.isDetailedErrorLoggingEnabled() != null ?
+                webSiteConfiguration.isDetailedErrorLoggingEnabled() :
+                false);
+        wsc.setRequestTracingEnabled(webSiteConfiguration.isRequestTracingEnabled() != null ?
+                webSiteConfiguration.isRequestTracingEnabled() :
+                false);
+        wsc.setRequestTracingExpirationTime(webSiteConfiguration.getRequestTracingExpirationTime() != null ?
+                webSiteConfiguration.getRequestTracingExpirationTime() :
+                new GregorianCalendar());
+        wsc.setRemoteDebuggingEnabled(webSiteConfiguration.isRemoteDebuggingEnabled() != null ?
+                webSiteConfiguration.isRemoteDebuggingEnabled() :
+                false);
+
+        List<ConnectionInfo> connectionInfoList = wsc.getConnectionInfoList();
+
+        for (WebSiteGetConfigurationResponse.ConnectionStringInfo connectionStringInfo :
+                webSiteConfiguration.getConnectionStrings()) {
+            if (connectionStringInfo.getName() != null && connectionStringInfo.getType() != null &&
+                    connectionStringInfo.getConnectionString() != null) {
+                connectionInfoList.add(new ConnectionInfo(connectionStringInfo.getName(),
+                        connectionStringInfo.getType().toString(),
+                        connectionStringInfo.getConnectionString()));
+            }
+        }
+
+        return wsc;
+    }
+
+    @NotNull
+    private static WebSiteUpdateConfigurationParameters loadWebSiteUpdateConfigurationParameters(@NotNull WebSiteConfiguration webSiteConfiguration) {
+        WebSiteUpdateConfigurationParameters wsucp = new WebSiteUpdateConfigurationParameters();
+
+        String javaVersion = webSiteConfiguration.getJavaVersion();
+        wsucp.setJavaVersion(javaVersion);
+
+        if (!javaVersion.equals("")) {
+            String javaContainer = webSiteConfiguration.getJavaContainer();
+            wsucp.setJavaContainer(javaContainer);
+
+            if (javaContainer.equals("TOMCAT")) {
+                wsucp.setJavaContainerVersion("7.0.50");
+            } else if (javaContainer.equals("JETTY")) {
+                wsucp.setJavaContainerVersion("9.1.0.20131115");
+            }
+        }
+
+        return wsucp;
     }
 
     private static void createVM(@NotNull ComputeManagementClient client,

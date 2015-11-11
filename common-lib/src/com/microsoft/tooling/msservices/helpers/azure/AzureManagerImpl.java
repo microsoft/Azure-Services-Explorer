@@ -23,6 +23,9 @@ package com.microsoft.tooling.msservices.helpers.azure;
 
 import com.google.common.base.Optional;
 import com.google.common.io.CharStreams;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -30,6 +33,8 @@ import com.google.gson.reflect.TypeToken;
 import com.microsoft.tooling.msservices.components.AppSettingsNames;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 import com.microsoft.tooling.msservices.components.PluginSettings;
+import com.microsoft.tooling.msservices.helpers.IDEHelper.ArtifactDescriptor;
+import com.microsoft.tooling.msservices.helpers.IDEHelper.ProjectDescriptor;
 import com.microsoft.tooling.msservices.helpers.*;
 import com.microsoft.tooling.msservices.helpers.auth.AADManager;
 import com.microsoft.tooling.msservices.helpers.auth.AADManagerImpl;
@@ -42,15 +47,28 @@ import com.microsoft.tooling.msservices.helpers.azure.rest.RestServiceManagerBas
 import com.microsoft.tooling.msservices.helpers.azure.rest.model.*;
 import com.microsoft.tooling.msservices.helpers.azure.sdk.AzureSDKHelper;
 import com.microsoft.tooling.msservices.helpers.azure.sdk.SDKRequestCallback;
+import com.microsoft.tooling.msservices.helpers.tasks.CancellableTask;
 import com.microsoft.tooling.msservices.model.Subscription;
 import com.microsoft.tooling.msservices.model.ms.*;
 import com.microsoft.tooling.msservices.model.storage.StorageAccount;
 import com.microsoft.tooling.msservices.model.vm.*;
+import com.microsoft.tooling.msservices.model.ws.WebHostingPlan;
+import com.microsoft.tooling.msservices.model.ws.WebSite;
+import com.microsoft.tooling.msservices.model.ws.WebSiteConfiguration;
+import com.microsoft.tooling.msservices.model.ws.WebSitePublishSettings;
+import com.microsoft.tooling.msservices.model.ws.WebSitePublishSettings.FTPPublishProfile;
+import com.microsoft.tooling.msservices.model.ws.WebSitePublishSettings.PublishProfile;
 import com.microsoft.tooling.msservices.serviceexplorer.EventHelper.EventWaitHandle;
 import com.microsoft.windowsazure.management.ManagementClient;
 import com.microsoft.windowsazure.management.compute.ComputeManagementClient;
 import com.microsoft.windowsazure.management.network.NetworkManagementClient;
 import com.microsoft.windowsazure.management.storage.StorageManagementClient;
+import com.microsoft.windowsazure.management.websites.WebSiteManagementClient;
+import com.microsoft.windowsazure.management.websites.models.GeoRegionNames;
+import com.microsoft.windowsazure.management.websites.models.WebSpaceNames;
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPReply;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -65,6 +83,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.*;
 import java.lang.reflect.Type;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.text.SimpleDateFormat;
@@ -889,11 +909,11 @@ public class AzureManagerImpl implements AzureManager {
 
     @Override
     public void deleteTable(@NotNull String subscriptionId, @NotNull String mobileServiceName,
-                            @NotNull String tableName) throws AzureCmdException  {
+                            @NotNull String tableName) throws AzureCmdException {
 
         String path = String.format("/%s/services/mobileservices/mobileservices/%s/tables/%s",
                 subscriptionId, mobileServiceName, tableName);
-        try{
+        try {
             executeRequest(subscriptionId, path, ContentType.Xml, "DELETE", null);
         } catch (Throwable t) {
             if (t instanceof AzureCmdException) {
@@ -906,11 +926,11 @@ public class AzureManagerImpl implements AzureManager {
 
     @Override
     public void deleteCustomApi(@NotNull String subscriptionId, @NotNull String mobileServiceName,
-                                @NotNull String apiName) throws AzureCmdException  {
+                                @NotNull String apiName) throws AzureCmdException {
 
         String path = String.format("/%s/services/mobileservices/mobileservices/%s/apis/%s",
                 subscriptionId, mobileServiceName, apiName);
-        try{
+        try {
             executeRequest(subscriptionId, path, ContentType.Xml, "DELETE", null);
         } catch (Throwable t) {
             if (t instanceof AzureCmdException) {
@@ -923,11 +943,11 @@ public class AzureManagerImpl implements AzureManager {
 
     @Override
     public void deleteJob(@NotNull String subscriptionId, @NotNull String mobileServiceName,
-                          @NotNull String jobName) throws AzureCmdException  {
+                          @NotNull String jobName) throws AzureCmdException {
 
         String path = String.format("/%s/services/mobileservices/mobileservices/%s/scheduler/jobs/%s",
                 subscriptionId, mobileServiceName, jobName);
-        try{
+        try {
             executeRequest(subscriptionId, path, ContentType.Xml, "DELETE", null);
         } catch (Throwable t) {
             if (t instanceof AzureCmdException) {
@@ -1259,6 +1279,245 @@ public class AzureManagerImpl implements AzureManager {
     public void deleteStorageAccount(@NotNull StorageAccount storageAccount)
             throws AzureCmdException {
         requestStorageSDK(storageAccount.getSubscriptionId(), AzureSDKHelper.deleteStorageAccount(storageAccount));
+    }
+
+    @NotNull
+    @Override
+    public List<String> getWebSpaces(@NotNull String subscriptionId)
+            throws AzureCmdException {
+        return requestWebSiteSDK(subscriptionId, AzureSDKHelper.getWebSpaces());
+    }
+
+    @NotNull
+    @Override
+    public List<WebSite> getWebSites(@NotNull String subscriptionId, @NotNull String webSpaceName)
+            throws AzureCmdException {
+        return requestWebSiteSDK(subscriptionId, AzureSDKHelper.getWebSites(webSpaceName));
+    }
+
+    @NotNull
+    @Override
+    public List<WebHostingPlan> getWebHostingPlans(@NotNull String subscriptionId, @NotNull String webSpaceName)
+            throws AzureCmdException {
+        return requestWebSiteSDK(subscriptionId, AzureSDKHelper.getWebHostingPlans(webSpaceName));
+    }
+
+    @NotNull
+    @Override
+    public WebSiteConfiguration getWebSiteConfiguration(@NotNull String subscriptionId, @NotNull String webSpaceName,
+                                                        @NotNull String webSiteName)
+            throws AzureCmdException {
+        return requestWebSiteSDK(subscriptionId, AzureSDKHelper.getWebSiteConfiguration(webSpaceName, webSiteName));
+    }
+
+    @NotNull
+    @Override
+    public WebSitePublishSettings getWebSitePublishSettings(@NotNull String subscriptionId, @NotNull String webSpaceName,
+                                                            @NotNull String webSiteName)
+            throws AzureCmdException {
+        return requestWebSiteSDK(subscriptionId, AzureSDKHelper.getWebSitePublishSettings(webSpaceName, webSiteName));
+    }
+
+    @Override
+    public void restartWebSite(@NotNull String subscriptionId, @NotNull String webSpaceName, @NotNull String webSiteName)
+            throws AzureCmdException {
+        requestWebSiteSDK(subscriptionId, AzureSDKHelper.restartWebSite(webSpaceName, webSiteName));
+    }
+
+    @NotNull
+    @Override
+    public WebSite createWebSite(@NotNull String subscriptionId, @NotNull String webSpaceName,
+                                 @NotNull String webHostingPlanName, @NotNull String webSiteName)
+            throws AzureCmdException {
+        return requestWebSiteSDK(subscriptionId, AzureSDKHelper.createWebSite(webSpaceName, webHostingPlanName, webSiteName));
+    }
+
+    @NotNull
+    @Override
+    public WebSiteConfiguration updateWebSiteConfiguration(@NotNull String subscriptionId,
+                                                           @NotNull String webSpaceName,
+                                                           @NotNull String webSiteName,
+                                                           @NotNull WebSiteConfiguration webSiteConfiguration)
+            throws AzureCmdException {
+        return requestWebSiteSDK(subscriptionId, AzureSDKHelper.updateWebSiteConfiguration(webSpaceName, webSiteName, webSiteConfiguration));
+    }
+
+    @NotNull
+    @Override
+    public WebHostingPlan createWebHostingPlan(@NotNull String subscriptionId,
+                                               @NotNull WebHostingPlan webHostingPlan)
+            throws AzureCmdException {
+        return requestWebSiteSDK(subscriptionId, AzureSDKHelper.createWebHostingPlan(webHostingPlan));
+    }
+
+    @NotNull
+    @Override
+    public List<String> getWebSiteGeoRegionNames()
+            throws AzureCmdException {
+        List<String> geoRegions = new ArrayList<String>();
+        geoRegions.add(GeoRegionNames.EASTUS);
+        geoRegions.add(GeoRegionNames.WESTUS);
+        geoRegions.add(GeoRegionNames.NORTHCENTRALUS);
+        geoRegions.add(GeoRegionNames.NORTHEUROPE);
+        geoRegions.add(GeoRegionNames.WESTEUROPE);
+        geoRegions.add(GeoRegionNames.EASTASIA);
+
+        return geoRegions;
+    }
+
+    @NotNull
+    @Override
+    public String getWebSpaceName(@NotNull String geoRegionName)
+            throws AzureCmdException {
+        if (GeoRegionNames.EASTUS.equals(geoRegionName)) {
+            return WebSpaceNames.EASTUSWEBSPACE;
+        } else if (GeoRegionNames.WESTUS.equals(geoRegionName)) {
+            return WebSpaceNames.WESTUSWEBSPACE;
+        } else if (GeoRegionNames.NORTHCENTRALUS.equals(geoRegionName)) {
+            return WebSpaceNames.NORTHCENTRALUSWEBSPACE;
+        } else if (GeoRegionNames.NORTHEUROPE.equals(geoRegionName)) {
+            return WebSpaceNames.NORTHEUROPEWEBSPACE;
+        } else if (GeoRegionNames.WESTEUROPE.equals(geoRegionName)) {
+            return WebSpaceNames.WESTEUROPEWEBSPACE;
+        } else if (GeoRegionNames.EASTASIA.equals(geoRegionName)) {
+            return WebSpaceNames.EASTASIAWEBSPACE;
+        } else {
+            return "";
+        }
+    }
+
+    @Nullable
+    @Override
+    public ArtifactDescriptor getWebArchiveArtifact(@NotNull ProjectDescriptor projectDescriptor)
+            throws AzureCmdException {
+        ArtifactDescriptor artifactDescriptor = null;
+
+        for (ArtifactDescriptor descriptor : DefaultLoader.getIdeHelper().getArtifacts(projectDescriptor)) {
+            if ("war".equals(descriptor.getArtifactType())) {
+                artifactDescriptor = descriptor;
+                break;
+            }
+        }
+
+        return artifactDescriptor;
+    }
+
+    @Override
+    public void deployWebArchiveArtifact(@NotNull final ProjectDescriptor projectDescriptor,
+                                         @NotNull final ArtifactDescriptor artifactDescriptor,
+                                         @NotNull final WebSite webSite) {
+        ListenableFuture<String> future = DefaultLoader.getIdeHelper().buildArtifact(projectDescriptor, artifactDescriptor);
+
+        Futures.addCallback(future, new FutureCallback<String>() {
+            @Override
+            public void onSuccess(final String artifactPath) {
+                try {
+                    DefaultLoader.getIdeHelper().runInBackground(projectDescriptor, "Deploying web app", "Deploying web app...", new CancellableTask() {
+                        @Override
+                        public void run(CancellationHandle cancellationHandle) throws Throwable {
+                            AzureManager manager = AzureManagerImpl.getManager();
+                            manager.publishWebArchiveArtifact(webSite.getSubscriptionId(), webSite.getWebSpaceName(), webSite.getName(), artifactPath);
+                            //manager.restartWebSite(selectedWebSite.getSubscriptionId(), selectedWebSite.getWebSpaceName(), selectedWebSite.getName());
+                        }
+
+                        @Override
+                        public void onCancel() {
+                        }
+
+                        @Override
+                        public void onSuccess() {
+                        }
+
+                        @Override
+                        public void onError(@NotNull Throwable throwable) {
+                            DefaultLoader.getUIHelper().showException("An error occurred while attempting to deploy web app.",
+                                    throwable, "MS Services - Error Deploying Web App", false, true);
+                        }
+                    });
+                } catch (AzureCmdException ex) {
+                    DefaultLoader.getUIHelper().showException("An error occurred while attempting to deploy web app.",
+                            ex, "MS Services - Error Deploying Web App", false, true);
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                DefaultLoader.getUIHelper().showException("An error occurred while attempting to build web archive artifact.", throwable,
+                        "MS Services - Error Building WAR Artifact", false, true);
+            }
+        });
+    }
+
+    @Override
+    public void publishWebArchiveArtifact(@NotNull String subscriptionId, @NotNull String webSpaceName,
+                                          @NotNull String webSiteName, @NotNull String artifactPath)
+            throws AzureCmdException {
+        WebSitePublishSettings webSitePublishSettings = getWebSitePublishSettings(subscriptionId, webSpaceName, webSiteName);
+
+        WebSitePublishSettings.FTPPublishProfile publishProfile = null;
+
+        for (PublishProfile pp : webSitePublishSettings.getPublishProfileList()) {
+            if (pp instanceof FTPPublishProfile) {
+                publishProfile = (FTPPublishProfile) pp;
+                break;
+            }
+        }
+
+        if (publishProfile == null) {
+            throw new AzureCmdException("Unable to retrieve FTP credentials to publish web site");
+        }
+
+        URI uri;
+
+        try {
+            uri = new URI(publishProfile.getPublishUrl());
+        } catch (URISyntaxException e) {
+            throw new AzureCmdException("Unable to parse FTP Publish Url information", e);
+        }
+
+        final FTPClient ftp = new FTPClient();
+
+        try {
+            ftp.connect(uri.getHost());
+            final int replyCode = ftp.getReplyCode();
+
+            if (!FTPReply.isPositiveCompletion(replyCode)) {
+                ftp.disconnect();
+                throw new AzureCmdException("Unable to connect to FTP server");
+            }
+
+            if (!ftp.login(publishProfile.getUserName(), publishProfile.getPassword())) {
+                ftp.logout();
+                throw new AzureCmdException("Unable to login to FTP server");
+            }
+
+            ftp.setFileType(FTP.BINARY_FILE_TYPE);
+
+            if (publishProfile.isFtpPassiveMode()) {
+                ftp.enterLocalPassiveMode();
+            }
+
+            String targetDir = getAbsolutePath(uri.getPath());
+            targetDir += "/webapps";
+
+            //ftp.changeWorkingDirectory(targetDir);
+
+            InputStream input = new FileInputStream(artifactPath);
+
+            ftp.storeFile(targetDir + "/ROOT.war", input);
+
+            input.close();
+            ftp.logout();
+        } catch (IOException e) {
+            throw new AzureCmdException("Unable to connect to the FTP server", e);
+        } finally {
+            if (ftp.isConnected()) {
+                try {
+                    ftp.disconnect();
+                } catch (IOException ignored) {
+                }
+            }
+        }
     }
 
     private void loadSubscriptions() {
@@ -1984,6 +2243,29 @@ public class AzureManagerImpl implements AzureManager {
     }
 
     @NotNull
+    private <T> T requestWebSiteSDK(@NotNull final String subscriptionId,
+                                    @NotNull final SDKRequestCallback<T, WebSiteManagementClient> requestCallback)
+            throws AzureCmdException {
+        return requestAzureSDK(subscriptionId, requestCallback, new AzureSDKClientProvider<WebSiteManagementClient>() {
+            @NotNull
+            @Override
+            public WebSiteManagementClient getSSLClient(@NotNull Subscription subscription)
+                    throws Throwable {
+                return AzureSDKHelper.getWebSiteManagementClient(subscription.getId(),
+                        subscription.getManagementCertificate(), subscription.getServiceManagementUrl());
+            }
+
+            @NotNull
+            @Override
+            public WebSiteManagementClient getAADClient(@NotNull String subscriptionId, @NotNull String accessToken)
+                    throws Throwable {
+                return AzureSDKHelper.getWebSiteManagementClient(subscriptionId,
+                        accessToken);
+            }
+        });
+    }
+
+    @NotNull
     private <T> T requestManagementSDK(@NotNull final String subscriptionId,
                                        @NotNull final SDKRequestCallback<T, ManagementClient> requestCallback)
             throws AzureCmdException {
@@ -2116,5 +2398,11 @@ public class AzureManagerImpl implements AzureManager {
         } finally {
             in.close();
         }
+    }
+
+
+    @NotNull
+    private static String getAbsolutePath(@NotNull String dir) {
+        return "/" + dir.trim().replace('\\', '/').replaceAll("^/+", "").replaceAll("/+$", "");
     }
 }

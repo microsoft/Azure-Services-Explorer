@@ -21,6 +21,10 @@
  */
 package com.microsoft.tooling.msservices.helpers;
 
+import com.google.common.util.concurrent.ListenableFuture;
+import com.microsoft.tooling.msservices.helpers.azure.AzureCmdException;
+import com.microsoft.tooling.msservices.helpers.tasks.CancellableTask;
+import com.microsoft.tooling.msservices.helpers.tasks.CancellableTask.CancellableTaskHandle;
 import com.microsoft.tooling.msservices.model.storage.*;
 import com.microsoft.tooling.msservices.serviceexplorer.Node;
 import org.apache.commons.lang3.tuple.Pair;
@@ -28,8 +32,53 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public interface IDEHelper {
+    class ProjectDescriptor {
+        @NotNull
+        private final String name;
+        @NotNull
+        private final String path;
+
+        public ProjectDescriptor(@NotNull String name, @NotNull String path) {
+            this.name = name;
+            this.path = path;
+        }
+
+        @NotNull
+        public String getName() {
+            return name;
+        }
+
+        @NotNull
+        public String getPath() {
+            return path;
+        }
+    }
+
+    class ArtifactDescriptor {
+        @NotNull
+        private String name;
+        @NotNull
+        private String artifactType;
+
+        public ArtifactDescriptor(@NotNull String name, @NotNull String artifactType) {
+            this.name = name;
+            this.artifactType = artifactType;
+        }
+
+        @NotNull
+        public String getName() {
+            return name;
+        }
+
+        @NotNull
+        public String getArtifactType() {
+            return artifactType;
+        }
+    }
+
     void openFile(@NotNull File file, @NotNull Node node);
 
     void saveFile(@NotNull File file, @NotNull ByteArrayOutputStream buff, @NotNull Node node);
@@ -73,6 +122,12 @@ public interface IDEHelper {
                          boolean isIndeterminate, @Nullable String indicatorText,
                          Runnable runnable);
 
+    @NotNull
+    CancellableTaskHandle runInBackground(@NotNull ProjectDescriptor projectDescriptor,
+                                          @NotNull String name,
+                                          @Nullable String indicatorText,
+                                          @NotNull CancellableTask cancellableTask) throws AzureCmdException;
+
     @Nullable
     String getProperty(@NotNull Object projectObject, @NotNull String name);
 
@@ -104,4 +159,12 @@ public interface IDEHelper {
     String[] getProperties(@NotNull String name);
 
     void setProperties(@NotNull String name, @NotNull String[] value);
+
+    @NotNull
+    List<ArtifactDescriptor> getArtifacts(@NotNull ProjectDescriptor projectDescriptor)
+            throws AzureCmdException;
+
+    @NotNull
+    ListenableFuture<String> buildArtifact(@NotNull ProjectDescriptor projectDescriptor,
+                                           @NotNull ArtifactDescriptor artifactDescriptor);
 }
