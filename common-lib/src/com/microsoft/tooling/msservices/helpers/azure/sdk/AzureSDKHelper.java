@@ -52,6 +52,7 @@ import com.microsoft.windowsazure.core.OperationStatusResponse;
 import com.microsoft.windowsazure.core.pipeline.apache.ApacheConfigurationProperties;
 import com.microsoft.windowsazure.core.utils.Base64;
 import com.microsoft.windowsazure.core.utils.KeyStoreType;
+import com.microsoft.windowsazure.exception.CloudError;
 import com.microsoft.windowsazure.exception.ServiceException;
 import com.microsoft.windowsazure.management.*;
 import com.microsoft.windowsazure.management.compute.*;
@@ -1594,8 +1595,10 @@ public class AzureSDKHelper {
         if (osr.getStatus() != OperationStatus.Succeeded) {
             if (osr.getError() != null) {
                 ServiceException ex = new ServiceException(osr.getError().getCode() + " : " + osr.getError().getMessage());
-                ex.setErrorCode(osr.getError().getCode());
-                ex.setErrorMessage(osr.getError().getMessage());
+                CloudError cloudError = new CloudError();
+                cloudError.setCode(osr.getError().getCode());
+                cloudError.setMessage(osr.getError().getMessage());
+                ex.setError(cloudError);
                 throw ex;
             } else {
                 throw new ServiceException("");
@@ -1629,8 +1632,10 @@ public class AzureSDKHelper {
         if (osr.getStatus() != OperationStatus.Succeeded) {
             if (osr.getError() != null) {
                 ServiceException ex = new ServiceException(osr.getError().getCode() + " : " + osr.getError().getMessage());
-                ex.setErrorCode(osr.getError().getCode());
-                ex.setErrorMessage(osr.getError().getMessage());
+                CloudError cloudError = new CloudError();
+                cloudError.setCode(osr.getError().getCode());
+                cloudError.setMessage(osr.getError().getMessage());
+                ex.setError(cloudError);
                 throw ex;
             } else {
                 throw new ServiceException("");
@@ -1666,8 +1671,10 @@ public class AzureSDKHelper {
         if (osr.getStatus() != WebSiteOperationStatus.Succeeded) {
             if (osr.getErrors() != null && osr.getErrors().size() > 0) {
                 ServiceException ex = new ServiceException(osr.getErrors().get(0).getCode() + " : " + osr.getErrors().get(0).getMessage());
-                ex.setErrorCode(osr.getErrors().get(0).getCode());
-                ex.setErrorMessage(osr.getErrors().get(0).getMessage());
+                CloudError cloudError = new CloudError();
+                cloudError.setCode(osr.getErrors().get(0).getCode());
+                cloudError.setMessage(osr.getErrors().get(0).getMessage());
+                ex.setError(cloudError);
                 throw ex;
             } else {
                 throw new ServiceException("");

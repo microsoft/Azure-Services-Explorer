@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>com.microsoft.tooling.msservices.intellij.azure-services-explorer</id>
   <name>Azure Services Explorer</name>
-  <version>1.0</version>
+  <version>1.1</version>
   <vendor email="xplatjava@microsoft.com" url="http://www.microsoft.com">Microsoft</vendor>
 
   <description><![CDATA[

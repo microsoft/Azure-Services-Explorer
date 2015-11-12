@@ -1,11 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE ApplicationInsights>
 <ApplicationInsights xmlns="http://schemas.microsoft.com/ApplicationInsights/2013/Settings" schemaVersion="2014-05-30">
-  <!--
-	Please do not modify below instrumentation key.
-	Use of this instrumentation key by any application other than Azure Services Explorer is strictly prohibited.
-  -->
-  <InstrumentationKey>220c5e6d-14da-4ae1-b2e4-8497bf78a6b1</InstrumentationKey>
+  <InstrumentationKey>appinsights-instrumentation-key</InstrumentationKey>
   <ContextInitializers>
   </ContextInitializers>
   <TelemetryInitializers>
